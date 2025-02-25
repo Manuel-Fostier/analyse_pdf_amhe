@@ -112,6 +112,8 @@ def extract_text_elements(pdf_path, search_string):
 
         print(f"Paragraph {para.index}:\n{para.text}\n")
 
+    return titles, titles_1, chapters, paragraphs, filtered_paragraphs
+
 # Example usage
 def main():
     pdf_path = 'Achille Marozzo - opéra nova.pdf'
