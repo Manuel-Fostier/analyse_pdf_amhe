@@ -46,48 +46,49 @@ def extract_text_elements(pdf_path, search_string):
     text_content = ""
 
     for i, word in enumerate(words):
-        if round(word['size']) == 80:
-            if text_content.strip() and current_title == "":
-                title_index += 1
-            current_title += word['text']
+        if word['text'] != ' ' :
+            if round(word['size']) == 80:
+                if text_content.strip() and current_title == "":
+                    title_index += 1
+                current_title += word['text']
 
-        elif round(word['size']) == 25:
-            if text_content.strip() and current_title_1 == "":
-                title_1_index += 1
-            current_title_1 += word['text']
+            elif round(word['size']) == 25:
+                if text_content.strip() and current_title_1 == "":
+                    title_1_index += 1
+                current_title_1 += word['text']
 
-        elif round(word['size']) == 20:
-            if text_content.strip() and current_chapter == "":
-                # Split the accumulated text into paragraphs
-                paragraphs_text = re.split(r'\n(?=[A-ZÉÈÊËÀÂÎÔÛÜÇ])', text_content)
-                text_content = ""
-                for para_index, para in enumerate(paragraphs_text, start=1):
-                    # Create a Paragraph object and associate it with the most recent Chapter
-                    paragraphs.append(Paragraph(para, para_index, chapters[chapter_index-1]))
-                chapter_index += 1
-            current_chapter += word['text']
-        else:
-            if current_title.strip():
-                # Create a Title object
-                titles.append(Title(current_title.strip(), title_index))
-                current_title = ""
-
-            if current_title_1.strip():
-                # Create a Title 1 object
-                titles_1.append(Title1(current_title_1.strip(), title_1_index, titles[title_index-1]))
-                current_title_1 = ""
-
-            if current_chapter.strip():
-                # Create a Chapter object
-                chapters.append(Chapter(current_chapter.strip(), chapter_index, titles_1[title_1_index-1]))
-                current_chapter = ""
-
-            # Add a newline if the difference in doctop between the current and next word is greater than 3
-            if i < len(words) - 1 and abs(words[i + 1]['doctop'] - word['doctop']) > 20: #diff entre deux lignes 14, entre deux paragraphes 25,9
-                text_content += word['text']
-                text_content += '\n'
+            elif round(word['size']) == 20:
+                if text_content.strip() and current_chapter == "":
+                    # Split the accumulated text into paragraphs
+                    paragraphs_text = re.split(r'\n(?=[A-ZÉÈÊËÀÂÎÔÛÜÇ])', text_content)
+                    text_content = ""
+                    for para_index, para in enumerate(paragraphs_text, start=1):
+                        # Create a Paragraph object and associate it with the most recent Chapter
+                        paragraphs.append(Paragraph(para, para_index, chapters[chapter_index-1]))
+                    chapter_index += 1
+                current_chapter += word['text']
             else:
-                text_content += word['text']
+                if current_title.strip():
+                    # Create a Title object
+                    titles.append(Title(current_title.strip(), title_index))
+                    current_title = ""
+
+                if current_title_1.strip():
+                    # Create a Title 1 object
+                    titles_1.append(Title1(current_title_1.strip(), title_1_index, titles[title_index-1]))
+                    current_title_1 = ""
+
+                if current_chapter.strip():
+                    # Create a Chapter object
+                    chapters.append(Chapter(current_chapter.strip(), chapter_index, titles_1[title_1_index-1]))
+                    current_chapter = ""
+
+                # Add a newline if the difference in doctop between the current and next word is greater than 3
+                if i < len(words) - 1 and abs(words[i + 1]['doctop'] - word['doctop']) > 20: #diff entre deux lignes 14, entre deux paragraphes 25,9
+                    text_content += word['text']
+                    text_content += '\n'
+                else:
+                    text_content += word['text']
 
     # Filtrer les paragraphes contenant le search_string
     filtered_paragraphs = [para for para in paragraphs if search_string in para.text]
@@ -114,7 +115,6 @@ def extract_text_elements(pdf_path, search_string):
 
     return titles, titles_1, chapters, paragraphs, filtered_paragraphs
 
-# Example usage
 def main():
     pdf_path = 'Achille Marozzo - opéra nova.pdf'
     search_string = input("Entrez la chaîne de caractères à rechercher: ")
