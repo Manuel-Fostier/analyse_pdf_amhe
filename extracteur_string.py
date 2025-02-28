@@ -25,11 +25,14 @@ class Paragraph(TextElement):
         super().__init__(text, index)
         self.chapter = chapter
 
-def extract_text_elements(pdf_path, search_string):
+def extract_text_elements(pdf_path, search_string, page_range):
+
+    # Ajuster la plage de pages pour l'indexage à partir de zéro
+    adjusted_page_range = [page - 1 for page in page_range]
     # Lire le fichier PDF
     words = []
     with pdfplumber.open(pdf_path) as pdf:
-        for page_num in range(32, 65):  # Les numéros de page PDF sont indexés à partir de zéro
+        for page_num in adjusted_page_range:
             page = pdf.pages[page_num]
             words += page.extract_words(keep_blank_chars=True, extra_attrs=['size'])
 
@@ -45,6 +48,7 @@ def extract_text_elements(pdf_path, search_string):
     paragraphs = []
     text_content = ""
 
+//TODO gérer les cas ou il n'y a pas de chapters dans lequel ranger le paragraph, Title_1 dans leque ranger le chapter ...
     for i, word in enumerate(words):
         if word['text'] != ' ' :
             if round(word['size']) == 80:
@@ -115,10 +119,47 @@ def extract_text_elements(pdf_path, search_string):
 
     return titles, titles_1, chapters, paragraphs, filtered_paragraphs
 
+def parse_page_range(input_str):
+    try:
+        # Vérifier si input_str contient des caractères non numériques ou spéciaux autres que '-'
+        if any(not char.isdigit() and char != '-' for char in input_str):
+            raise ValueError("Erreur : L'entrée contient des caractères non numériques ou spéciaux autres que '-'.")
+
+        # Vérifier si '-' est le premier ou le dernier caractère
+        if input_str.startswith('-') or input_str.endswith('-'):
+            raise ValueError("Erreur : '-' ne peut pas être le premier ou le dernier caractère.")
+
+        if '-' in input_str:
+            # Cas où l'entrée est de la forme "start-end"
+            start, end = map(int, input_str.split('-'))
+            if start == 0 or end == 0:
+                raise ValueError("Erreur : La page 0 n'est pas valide.")
+            return range(start, end + 1)
+        elif ',' in input_str:
+            # Cas où l'entrée est de la forme "page1, page2, page3, ..."
+            pages = list(map(int, input_str.split(',')))
+            if 0 in pages:
+                raise ValueError("Erreur : La page 0 n'est pas valide.")
+            return pages
+        else:
+            # Cas où l'entrée est un seul numéro de page
+            page = int(input_str)
+            if page == 0:
+                raise ValueError("Erreur : La page 0 n'est pas valide.")
+            return [page]
+    except ValueError as e:
+        print(e)
+        return []
+
 def main():
     pdf_path = 'Achille Marozzo - opéra nova.pdf'
     search_string = input("Entrez la chaîne de caractères à rechercher: ")
-    extract_text_elements(pdf_path, search_string)
+    search_range  = input("Personnaliser la plage de pages (ex: 32-65 ou 32, 34, 60, 63): ")
+    page_range = parse_page_range(search_range)
+    if not  page_range :
+        print("Plage invalide !")
+    else :
+        extract_text_elements(pdf_path, search_string, page_range)
 
 if __name__ == "__main__":
     main()
