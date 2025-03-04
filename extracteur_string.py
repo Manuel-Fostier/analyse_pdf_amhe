@@ -96,8 +96,11 @@ def extract_text_elements(pdf_path, search_string, page_range):
     # Filtrer les paragraphes contenant le search_string
     filtered_paragraphs = [para for para in paragraphs if search_string in para.text]
 
+    # Compter le nombre d'occurrences trouvées
+    num_occurrences = sum(para.text.lower().count(search_string.lower()) for para in filtered_paragraphs)
+
     # Afficher le nombre d'occurrences trouvées
-    print(f"Nombre d'occurrences trouvées: {len(filtered_paragraphs)}\n")
+    print(f"Nombre d'occurrences trouvées: {num_occurrences}\n")
 
     # Afficher les titres et paragraphes trouvés avec le numéro du paragraphe
     previous_title = None
