@@ -36,19 +36,18 @@ def extract_text_elements(pdf_path, search_string, page_range):
             page = pdf.pages[page_num]
             words += page.extract_words(keep_blank_chars=True, extra_attrs=['size'])
 
-    titles = []
+    titles = [Title("", 0)]
     current_title = ""
     title_index = 1
-    titles_1 = []
+    titles_1 = [Title1("", 0, titles[0])]
     current_title_1 = ""
     title_1_index = 1
-    chapters = []
+    chapters = [Chapter("", 0, titles_1[0])]
     current_chapter = ""
     chapter_index = 1
     paragraphs = []
     text_content = ""
 
-//TODO gérer les cas ou il n'y a pas de chapters dans lequel ranger le paragraph, Title_1 dans leque ranger le chapter ...
     for i, word in enumerate(words):
         if word['text'] != ' ' :
             if round(word['size']) == 80:
@@ -105,15 +104,19 @@ def extract_text_elements(pdf_path, search_string, page_range):
     previous_title1 = None
 
     for para in filtered_paragraphs:
-        if para.chapter.title1.title.text != previous_title:
-            print(f"#{para.chapter.title1.title.text}")
-            previous_title = para.chapter.title1.title.text
+        title = para.chapter.title1.title.text
+        if title != previous_title and title:
+            print(f"#{title}")
+            previous_title = title
 
-        if para.chapter.title1.text != previous_title1:
-            print(f"##{para.chapter.title1.text}")
-            previous_title1 = para.chapter.title1.text
+        title1 = para.chapter.title1.text
+        if title1 != previous_title1 and title1:
+            print(f"##{title1}")
+            previous_title1 = title1
 
-        print(f"###{para.chapter.text}")
+        chapter = para.chapter.text
+        if chapter :
+            print(f"###{chapter}")
 
         print(f"Paragraph {para.index}:\n{para.text}\n")
 
