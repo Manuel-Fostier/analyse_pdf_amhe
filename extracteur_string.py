@@ -25,6 +25,18 @@ class Paragraph(TextElement):
         super().__init__(text, index)
         self.chapter = chapter
 
+def create_and_append_paragraphs(text, chapter, chapter_index):
+    paragraphs = []
+    if text == "":
+        return ""
+    # Split the accumulated text into paragraphs
+    paragraphs_text = re.split(r'\n(?=[A-ZÉÈÊËÀÂÎÔÛÜÇ])', text)
+    # Associate each Paragraph to current Chapter
+    for para_index, para in enumerate(paragraphs_text, start=1):
+        paragraphs.append(Paragraph(para, para_index, chapter[chapter_index]))
+
+    return paragraphs
+
 def extract_text_elements(pdf_path, search_string, page_range):
 
     # Ajuster la plage de pages pour l'indexage à partir de zéro
@@ -75,12 +87,8 @@ def extract_text_elements(pdf_path, search_string, page_range):
                     chapter_index += 1
                     current_chapter = ""
 
-                else :
-                    # Split the accumulated text into paragraphs
-                    paragraphs_text = re.split(r'\n(?=[A-ZÉÈÊËÀÂÎÔÛÜÇ])', text_content)
-                    # Associate each Paragraph to current Chapter
-                    for para_index, para in enumerate(paragraphs_text, start=1):
-                        paragraphs.append(Paragraph(para, para_index, chapters[chapter_index-1]))
+                else :                  
+                    paragraphs += create_and_append_paragraphs(text_content, chapters, chapter_index-1)
                     text_content = ""                          
 
             if current_word_size == 80:
@@ -101,6 +109,10 @@ def extract_text_elements(pdf_path, search_string, page_range):
                     text_content += word_text
 
             previous_word_size = current_word_size
+
+    # Taking account last paragraph of the last page
+    if text_content.split() :
+        paragraphs += create_and_append_paragraphs(text_content, chapters, chapter_index-1)
 
     # Filtrer les paragraphes contenant le search_string
     filtered_paragraphs = [para for para in paragraphs if search_string in para.text]
