@@ -40,11 +40,11 @@ def add_title(titles, text, index):
     else:
         titles.append(Title(text.strip(), index))
 
-def add_title1(titles_1, text, index, title):
-    if len(titles_1) == 1 and titles_1[0].text == "":
-        titles_1[0] = Title1(text.strip(), 0, title)
+def add_title1(text, index, title):
+    if len(title.titles_1_list) == 1 and title.titles_1_list[0].text == "":
+        title.titles_1_list[0] = Title1(text.strip(), 0, title)
     else:
-        titles_1.append(Title1(text.strip(), index, title))
+         title.titles_1_list.append(Title1(text.strip(), index, title))
 
 def add_chapter(chapters, text, index, title_1):
     if len(chapters) == 1 and chapters[0].text == "":
@@ -110,13 +110,7 @@ def extract_text_elements(pdf_path, search_string, page_range):
                     title_index += 1
                     current_title_text = ""
                 elif previous_word_size == 25:
-                    current_title.titles_1_list.append(
-                        Title1(
-                            current_title_1_text.strip(),
-                            title_1_index,
-                            current_title
-                        )
-                    )
+                    add_title1(current_title_1_text, title_1_index, current_title)                    
                     current_title_1 = current_title.titles_1_list[-1]
                     current_chapter = current_title_1.chapter_list[0]
                     title_1_index += 1
