@@ -36,9 +36,21 @@ class Paragraph(TextElement):
 
 def add_title(titles, text, index):
     if len(titles) == 1 and titles[0].text == "":
-        titles[0] = Title(text.strip(), index)
+        titles[0] = Title(text.strip(), 0)
     else:
         titles.append(Title(text.strip(), index))
+
+def add_title1(titles_1, text, index, title):
+    if len(titles_1) == 1 and titles_1[0].text == "":
+        titles_1[0] = Title1(text.strip(), 0, title)
+    else:
+        titles_1.append(Title1(text.strip(), index, title))
+
+def add_chapter(chapters, text, index, title_1):
+    if len(chapters) == 1 and chapters[0].text == "":
+        chapters[0] = Chapter(text.strip(), 0, title_1)
+    else:
+        chapters.append(Chapter(text.strip(), index, title_1))
 
 
 def create_and_append_paragraphs(text, chapter):
@@ -225,8 +237,8 @@ def main():
     # search_string = input("Entrez la chaîne de caractères à rechercher: ")
     search_string = 'guardi di testa'
     # search_range  = input("Personnaliser la plage de pages (ex: 32-65 ou 32, 34, 60, 63): ")
-    # search_range = '34-64'
-    search_range = '60'
+    search_range = '34-64'
+    # search_range = '60'
     page_range = parse_page_range(search_range)
     if not page_range:
         print("Plage invalide !")
