@@ -46,11 +46,11 @@ def add_title1(text, index, title):
     else:
          title.titles_1_list.append(Title1(text.strip(), index, title))
 
-def add_chapter(chapters, text, index, title_1):
-    if len(chapters) == 1 and chapters[0].text == "":
-        chapters[0] = Chapter(text.strip(), 0, title_1)
+def add_chapter( text, index, title_1):
+    if len(title_1.chapter_list) == 1 and title_1.chapter_list[0].text == "":
+        title_1.chapter_list[0] = Chapter(text.strip(), 0, title_1)
     else:
-        chapters.append(Chapter(text.strip(), index, title_1))
+        title_1.chapter_list.append(Chapter(text.strip(), index, title_1))
 
 
 def create_and_append_paragraphs(text, chapter):
@@ -116,12 +116,7 @@ def extract_text_elements(pdf_path, search_string, page_range):
                     title_1_index += 1
                     current_title_1_text = ""
                 elif previous_word_size == 20:
-                    current_title_1.chapter_list.append(
-                        Chapter(
-                            current_chapter_text.strip(),
-                            chapter_index,
-                            current_title_1)
-                    )
+                    add_chapter(current_chapter_text, chapter_index, current_title_1)                    
                     current_chapter = current_title_1.chapter_list[-1]
                     chapter_index += 1
                     current_chapter_text = ""
