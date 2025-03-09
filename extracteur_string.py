@@ -41,15 +41,15 @@ def add_title(titles, text, index):
         titles.append(Title(text.strip(), index))
 
 def add_title1(text, index, title):
-    if len(title.titles_1_list) == 1 and title.titles_1_list[0].text == "":
-        title.titles_1_list[0] = Title1(text.strip(), 0, title)
-    else:
+    # if len(title.titles_1_list) == 1 and title.titles_1_list[0].text == "":
+    #     title.titles_1_list[0] = Title1(text.strip(), 0, title)
+    # else:
          title.titles_1_list.append(Title1(text.strip(), index, title))
 
 def add_chapter( text, index, title_1):
-    if len(title_1.chapter_list) == 1 and title_1.chapter_list[0].text == "":
-        title_1.chapter_list[0] = Chapter(text.strip(), 0, title_1)
-    else:
+    # if len(title_1.chapter_list) == 1 and title_1.chapter_list[0].text == "":
+    #     title_1.chapter_list[0] = Chapter(text.strip(), 0, title_1)
+    # else:
         title_1.chapter_list.append(Chapter(text.strip(), index, title_1))
 
 
@@ -146,11 +146,13 @@ def extract_text_elements(pdf_path, search_string, page_range):
         create_and_append_paragraphs(text_content, current_chapter)
 
     # Filtrer les paragraphes contenant le search_string
+    filtered_paragraphs = []
     for title in titles:
         for title_1 in title.titles_1_list:
             for chapter in title_1.chapter_list:
-                filtered_paragraphs = [
-                    para for para in chapter.paragraph_list if search_string in para.text]
+                for para in chapter.paragraph_list:
+                     if search_string.strip().lower() in para.text.strip().lower():
+                        filtered_paragraphs += para                 
 
     # Compter le nombre d'occurrences trouvées
     num_occurrences = sum(para.text.lower().count(
@@ -226,8 +228,8 @@ def main():
     # search_string = input("Entrez la chaîne de caractères à rechercher: ")
     search_string = 'guardi di testa'
     # search_range  = input("Personnaliser la plage de pages (ex: 32-65 ou 32, 34, 60, 63): ")
-    search_range = '34-64'
-    # search_range = '60'
+    # search_range = '34-64'
+    search_range = '60'
     page_range = parse_page_range(search_range)
     if not page_range:
         print("Plage invalide !")
