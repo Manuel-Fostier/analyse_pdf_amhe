@@ -40,17 +40,19 @@ def add_title(titles, text, index):
     else:
         titles.append(Title(text.strip(), index))
 
+
 def add_title1(text, index, title):
     # if len(title.titles_1_list) == 1 and title.titles_1_list[0].text == "":
     #     title.titles_1_list[0] = Title1(text.strip(), 0, title)
     # else:
-         title.titles_1_list.append(Title1(text.strip(), index, title))
+    title.titles_1_list.append(Title1(text.strip(), index, title))
 
-def add_chapter( text, index, title_1):
+
+def add_chapter(text, index, title_1):
     # if len(title_1.chapter_list) == 1 and title_1.chapter_list[0].text == "":
     #     title_1.chapter_list[0] = Chapter(text.strip(), 0, title_1)
     # else:
-        title_1.chapter_list.append(Chapter(text.strip(), index, title_1))
+    title_1.chapter_list.append(Chapter(text.strip(), index, title_1))
 
 
 def create_and_append_paragraphs(text, chapter):
@@ -110,13 +112,15 @@ def extract_text_elements(pdf_path, search_string, page_range):
                     title_index += 1
                     current_title_text = ""
                 elif previous_word_size == 25:
-                    add_title1(current_title_1_text, title_1_index, current_title)                    
+                    add_title1(current_title_1_text,
+                               title_1_index, current_title)
                     current_title_1 = current_title.titles_1_list[-1]
                     current_chapter = current_title_1.chapter_list[0]
                     title_1_index += 1
                     current_title_1_text = ""
                 elif previous_word_size == 20:
-                    add_chapter(current_chapter_text, chapter_index, current_title_1)                    
+                    add_chapter(current_chapter_text,
+                                chapter_index, current_title_1)
                     current_chapter = current_title_1.chapter_list[-1]
                     chapter_index += 1
                     current_chapter_text = ""
@@ -151,9 +155,13 @@ def extract_text_elements(pdf_path, search_string, page_range):
         for title_1 in title.titles_1_list:
             for chapter in title_1.chapter_list:
                 for para in chapter.paragraph_list:
-                     if search_string.strip().lower() in para.text.strip().lower():
-                        filtered_paragraphs += para                 
+                    if search_string.strip().lower() in para.text.strip().lower():
+                        filtered_paragraphs += para
 
+    return filtered_paragraphs
+
+
+def print_filtered_paragraphs(filtered_paragraphs, search_string):
     # Compter le nombre d'occurrences trouvées
     num_occurrences = sum(para.text.lower().count(
         search_string.lower()) for para in filtered_paragraphs)
@@ -182,8 +190,6 @@ def extract_text_elements(pdf_path, search_string, page_range):
             print(f"###{chapter}")
 
         print(f"Paragraph {para.index}:\n{para.text}\n")
-
-    return filtered_paragraphs
 
 
 def parse_page_range(input_str):
@@ -234,9 +240,9 @@ def main():
     if not page_range:
         print("Plage invalide !")
     else:
-        extract_text_elements(pdf_path, search_string, page_range)
-
-    # extract_text_elements(pdf_path, "guardia di testa", [56])
+        filtered_paragraphs = extract_text_elements(
+            pdf_path, search_string, page_range)
+        print_filtered_paragraphs(filtered_paragraphs, search_string)
 
 
 if __name__ == "__main__":
