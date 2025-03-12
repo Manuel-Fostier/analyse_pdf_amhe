@@ -149,14 +149,17 @@ def extract_text_elements(pdf_path, search_string, page_range):
     if text_content.split():
         create_and_append_paragraphs(text_content, current_chapter)
 
-    # Filtrer les paragraphes contenant le search_string
+    return titles
+
+
+def find_paragraphs_containing_string(titles, search_string):
     filtered_paragraphs = []
     for title in titles:
         for title_1 in title.titles_1_list:
             for chapter in title_1.chapter_list:
-                for para in chapter.paragraph_list:
-                    if search_string.strip().lower() in para.text.strip().lower():
-                        filtered_paragraphs += para
+                    for para in chapter.paragraph_list:
+                        if (search_string in para.text):
+                            filtered_paragraphs.append(para)
 
     return filtered_paragraphs
 
@@ -232,7 +235,7 @@ def parse_page_range(input_str):
 def main():
     pdf_path = "Achille Marozzo - opéra nova.pdf"
     # search_string = input("Entrez la chaîne de caractères à rechercher: ")
-    search_string = 'guardi di testa'
+    search_string = "guardia di testa"
     # search_range  = input("Personnaliser la plage de pages (ex: 32-65 ou 32, 34, 60, 63): ")
     # search_range = '34-64'
     search_range = '60'
@@ -240,8 +243,9 @@ def main():
     if not page_range:
         print("Plage invalide !")
     else:
-        filtered_paragraphs = extract_text_elements(
-            pdf_path, search_string, page_range)
+        titles = extract_text_elements(pdf_path, search_string, page_range)
+        filtered_paragraphs = find_paragraphs_containing_string(
+            titles, search_string)
         print_filtered_paragraphs(filtered_paragraphs, search_string)
 
 
