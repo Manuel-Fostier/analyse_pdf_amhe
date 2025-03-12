@@ -40,6 +40,7 @@ class OperaNovaGUI:
         self.show_info_button = tk.Button(
             root, text="Afficher les informations", command=self.show_info)
         self.show_info_button.grid(row=4, column=0, columnspan=2, pady=10)
+        self.root.bind('<Return>', lambda event=None: self.show_info())
 
         # Zone de texte pour afficher les informations
         self.info_text = tk.Text(root, height=40, width=160)
