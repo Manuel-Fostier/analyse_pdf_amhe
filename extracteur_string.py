@@ -45,16 +45,10 @@ def add_title(titles, text, index):
 
 
 def add_title1(text, index, title):
-    # if len(title.titles_1_list) == 1 and title.titles_1_list[0].text == "":
-    #     title.titles_1_list[0] = Title1(text.strip(), 0, title)
-    # else:
     title.titles_1_list.append(Title1(text.strip(), index, title))
 
 
 def add_chapter(text, index, title_1):
-    # if len(title_1.chapter_list) == 1 and title_1.chapter_list[0].text == "":
-    #     title_1.chapter_list[0] = Chapter(text.strip(), 0, title_1)
-    # else:
     title_1.chapter_list.append(Chapter(text.strip(), index, title_1))
 
 
@@ -69,7 +63,7 @@ def create_and_append_paragraphs(text, chapter):
         chapter.paragraph_list.append(Paragraph(para, para_index, chapter))
 
 
-def extract_text_elements(pdf_path, search_string, page_range):
+def extract_text_elements(pdf_path, page_range):
 
     # Ajuster la plage de pages pour l'indexage à partir de zéro
     adjusted_page_range = [page - 1 for page in page_range]
@@ -167,36 +161,37 @@ def find_paragraphs_containing_string(titles, search_string):
     return filtered_paragraphs
 
 
-def print_filtered_paragraphs(filtered_paragraphs, search_string):
+def sub_string_qty(filtered_paragraphs, search_string):
     # Compter le nombre d'occurrences trouvées
     num_occurrences = sum(para.text.lower().count(
         search_string.lower()) for para in filtered_paragraphs)
 
-    # Display search string, number of occurrences, and paragraphs found
-    print(f"Search String: {search_string}")
-    print(f"Nombre d'occurrences trouvées: {num_occurrences}\n")
+    return num_occurrences
 
-    # Afficher les titres et paragraphes trouvés avec le numéro du paragraphe
+
+def filtered_paragraphs_to_string(filtered_paragraphs):
     previous_title = None
     previous_title1 = None
+    info = ""
 
     for para in filtered_paragraphs:
         title = para.parent_chapter.parent_title1.parent_title.text
         if title != previous_title and title:
-            print(f"#{title}")
-            previous_title = title
+            info += f"#{title}\n"
+            previous_title = previous_title = title
 
         title1 = para.parent_chapter.parent_title1.text
         if title1 != previous_title1 and title1:
-            print(f"##{title1}")
+            info += f"##{title1}\n"
             previous_title1 = title1
 
         chapter = para.parent_chapter.text
         if chapter:
-            print(f"###{chapter}")
+            info += f"###{chapter}\n"
 
-        print(f"Paragraph {para.index}:\n{para.text}\n")
+        info += f"Paragraph {para.index}:\n{para.text.strip()}\n\n"
 
+    return info
 
 def parse_page_range(input_str):
     try:
@@ -234,6 +229,17 @@ def parse_page_range(input_str):
         print(e)
         return []
 
+def print_filtered_paragraphs(filtered_paragraphs, search_string):
+
+    num_occurrences = sub_string_qty(filtered_paragraphs, search_string)
+
+    # Display search string, number of occurrences, and paragraphs found
+    print(f"Search String: {search_string}")
+    print(f"Nombre d'occurrences trouvées: {num_occurrences}\n")
+
+    str_filtered_paragraphs = filtered_paragraphs_to_string(
+        filtered_paragraphs)
+    print(str_filtered_paragraphs)
 
 def main():
     pdf_path = "Achille Marozzo - opéra nova.pdf"
@@ -243,7 +249,7 @@ def main():
     # search_range = '34-102' # Livre 3
     # search_range = '35-55' # 1er assault
     # search_range = '56-65' # 2eme assault
-    search_range = '35-65' # 1er et 2eme assault
+    search_range = '35-65'  # 1er et 2eme assault
     # search_range = '66-70' # 3eme assault droit fil contre droit fil
     # search_range = '70-73' # 3eme assault falso contre falso
     # search_range = '66-73' # 3eme assault complet
@@ -252,7 +258,7 @@ def main():
     if not page_range:
         print("Plage invalide !")
     else:
-        titles = extract_text_elements(pdf_path, search_string, page_range)
+        titles = extract_text_elements(pdf_path,  page_range)
         filtered_paragraphs = find_paragraphs_containing_string(
             titles, search_string)
         print_filtered_paragraphs(filtered_paragraphs, search_string)
