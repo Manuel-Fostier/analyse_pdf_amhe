@@ -12,6 +12,7 @@ class Title(TextElement):
     def __init__(self, text, index):
         super().__init__(text, index)
         self.titles_1_list = [Title1("", 0, self)]
+        self.SIZE = 80
 
 
 class Title1(TextElement):
@@ -19,6 +20,7 @@ class Title1(TextElement):
         super().__init__(text, index)
         self.parent_title = title
         self.chapter_list = [Chapter("", 0, self)]
+        self.SIZE = 25
 
 
 class Chapter(TextElement):
@@ -26,6 +28,7 @@ class Chapter(TextElement):
         super().__init__(text, index)
         self.parent_title1 = title1
         self.paragraph_list = []
+        self.SIZE = 20
 
 
 class Paragraph(TextElement):
@@ -104,21 +107,21 @@ def extract_text_elements(pdf_path, search_string, page_range):
                 previous_word_size = current_word_size
 
             if current_word_size != previous_word_size:
-                if previous_word_size == 80:
+                if previous_word_size == current_title.SIZE:
                     add_title(titles, current_title_text, len(titles))
                     current_title = titles[-1]
                     current_title_1 = current_title.titles_1_list[0]
                     current_chapter = current_title.titles_1_list[0].chapter_list[0]
                     title_index += 1
                     current_title_text = ""
-                elif previous_word_size == 25:
+                elif previous_word_size == current_title_1.SIZE:
                     add_title1(current_title_1_text,
                                title_1_index, current_title)
                     current_title_1 = current_title.titles_1_list[-1]
                     current_chapter = current_title_1.chapter_list[0]
                     title_1_index += 1
                     current_title_1_text = ""
-                elif previous_word_size == 20:
+                elif previous_word_size == current_chapter.SIZE:
                     add_chapter(current_chapter_text,
                                 chapter_index, current_title_1)
                     current_chapter = current_title_1.chapter_list[-1]
@@ -128,11 +131,11 @@ def extract_text_elements(pdf_path, search_string, page_range):
                     create_and_append_paragraphs(text_content, current_chapter)
                     text_content = ""
 
-            if current_word_size == 80:
+            if current_word_size == current_title.SIZE:
                 current_title_text += word_text
-
+            elif current_word_size == current_title_1.SIZE:
                 current_title_1_text += word_text
-            elif current_word_size == 20:
+            elif current_word_size == current_chapter.SIZE:
                 current_chapter_text += word_text
             else:
                 # Add a newline if the difference in doctop between the current and next word is greater than 3
@@ -157,9 +160,9 @@ def find_paragraphs_containing_string(titles, search_string):
     for title in titles:
         for title_1 in title.titles_1_list:
             for chapter in title_1.chapter_list:
-                    for para in chapter.paragraph_list:
-                        if (search_string in para.text):
-                            filtered_paragraphs.append(para)
+                for para in chapter.paragraph_list:
+                    if (search_string in para.text):
+                        filtered_paragraphs.append(para)
 
     return filtered_paragraphs
 
@@ -237,8 +240,14 @@ def main():
     # search_string = input("Entrez la chaîne de caractères à rechercher: ")
     search_string = "guardia di testa"
     # search_range  = input("Personnaliser la plage de pages (ex: 32-65 ou 32, 34, 60, 63): ")
-    # search_range = '34-64'
-    search_range = '60'
+    # search_range = '34-102' # Livre 3
+    # search_range = '35-55' # 1er assault
+    # search_range = '56-65' # 2eme assault
+    search_range = '35-65' # 1er et 2eme assault
+    # search_range = '66-70' # 3eme assault droit fil contre droit fil
+    # search_range = '70-73' # 3eme assault falso contre falso
+    # search_range = '66-73' # 3eme assault complet
+    # search_range = '56'
     page_range = parse_page_range(search_range)
     if not page_range:
         print("Plage invalide !")
